@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hành Trình Phấn Trắng: Sư Phạm Văn</title>
+    <style>
+        :root {
+            --bg-color: #1a1e24;
+            --card-bg: rgba(30, 41, 59, 0.85);
+            --border-color: #3b82f6;
+            --text-main: #f8fafc;
+            --accent-color: #f59e0b;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 10px;
+        }
+
+        #game-container {
+            width: 100%;
+            max-width: 900px;
+            height: 650px;
+            background: linear-gradient(to bottom, #0f172a, #1e293b);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Top Header & Stats Bar */
+        #header-bar {
+            background: rgba(15, 23, 42, 0.95);
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .phase-badge {
+            background: var(--accent-color);
+            color: #000;
+            font-weight: bold;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
+
+        .stats-container {
+            display: flex;
+            gap: 15px;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        /* Main Display Screen */
+        #main-screen {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .dialog-box {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-left: 4px solid var(--border-color);
+            border-radius: 8px;
+            padding: 18px;
+            font-size: 1.05rem;
+            line-height: 1.6;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .interaction-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        /* Interactive Elements */
+        .quiz-option, .choice-btn, .action-btn {
+            background: rgba(51, 65, 85, 0.8);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 12px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+        }
+
+        .quiz-option:hover, .choice-btn:hover, .action-btn:hover {
+            background: #3b82f6;
+            border-color: #60a5fa;
+            transform: translateY(-2px);
+        }
+
+        .action-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        /* Progress Bar */
+        .progress-bar-container {
+            width: 100%;
+            height: 8px;
+            background: #334155;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: var(--success-color);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* Game Log & Feedback */
+        .feedback-text {
+            color: var(--accent-color);
+            font-style: italic;
+            margin-top: 8px;
+            font-size: 0.95rem;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Custom Scrollbar */
+        #main-screen::-webkit-scrollbar {
+            width: 6px;
+        }
+        #main-screen::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <!-- Header with Stats -->
+    <div id="header-bar">
+        <div>
+            <span id="phase-badge" class="phase-badge">Học Kỳ 1</span>
+            <span id="semester-title" style="margin-left: 10px; font-weight: bold; color: #94a3b8;">Năm 1 - Nhập Môn</span>
+        </div>
+        <div class="stats-container">
+            <div class="stat-item" title="Chuyên môn Văn học">📚 <span id="stat-c">10</span></div>
+            <div class="stat-item" title="Kỹ năng Sư phạm">🎓 <span id="stat-s">10</span></div>
+            <div class="stat-item" title="Đạo đức Nghề nghiệp">❤️ <span id="stat-d">50</span></div>
+            <div class="stat-item" title="Thể lực / Năng lượng">⚡ <span id="stat-e">100</span>/100</div>
+        </div>
+    </div>
+
+    <!-- Main Game Window -->
+    <div id="main-screen">
+        <div class="dialog-box" id="dialog-text">
+            Chào mừng bạn đến với Khoa Ngữ văn! Bạn vừa chính thức bước chân vào hành trình trở thành Giáo viên Ngữ văn tương lai. Hãy rèn luyện kiến thức và kỹ năng để chuẩn bị cho kỳ Thực tập Sư phạm!
+        </div>
+        
+        <div id="interaction-area" class="interaction-area">
+            <!-- Dynamic Actions/Questions Will Be Inserted Here -->
+        </div>
+    </div>
+</div>
+
+<script>
+    // State Management
+    const gameState = {
+        semester: 1,
+        weeksPassed: 0,
+        stats: {
+            C: 10,  // Chuyên môn
+            S: 10,  // Sư phạm
+            D: 50,  // Đạo đức
+            E: 100  // Thể lực
+        },
+        lessonPlanScore: 0,
+        internshipProgress: 0
+    };
+
+    // Literary Quizzes Data
+    const literaryQuizzes = [
+        {
+            question: "Điền từ còn thiếu vào câu thơ của Hàn Mặc Tử: 'Sao anh không về chơi...?'",
+            options: ["thôn Vĩ", "chợ Huyện", "bến Xưa", "sông Hương"],
+            correct: 0,
+            reward: { C: 8, E: -15 }
+        },
+        {
+            question: "Trong tác phẩm 'Chí Phèo', chi tiết bát cháo hành của Thị Nở thể hiện điều gì rõ nhất?",
+            options: [
+                "Món ăn truyền thống đặc trưng của làng Vũ Đại",
+                "Biểu tượng của tình thương chân thành thức tỉnh nhân tính",
+                "Sự nghèo khổ và túng thiếu của người nông dân",
+                "Bi kịch bị từ chối quyền làm người"
+            ],
+            correct: 1,
+            reward: { C: 10, E: -15 }
+        },
+        {
+            question: "Phong cách nghệ thuật của Nguyễn Tuân trước Cách mạng tháng Tám được đặc trưng bởi từ khóa nào?",
+            options: ["Hiện thực thô giáp", "Ngông và Chủ nghĩa Xô dịch", "Lãng mạn dịu dàng", "Triết lý nhân sinh sâu sắc"],
+            correct: 1,
+            reward: { C: 10, E: -15 }
+        },
+        {
+            question: "Truyện ngắn 'Rừng xà nu' của Nguyễn Trung Thành sử dụng hình tượng cây xà nu để tượng trưng cho điều gì?",
+            options: [
+                "Vẻ đẹp thiên nhiên hoang sơ của Tây Nguyên",
+                "Sức sống bất diệt và tinh thần kiên cường của nhân dân Tây Nguyên",
+                "Nỗi đau thương của chiến tranh",
+                "Tình yêu đôi lứa của Tnú và Mai"
+            ],
+            correct: 1,
+            reward: { C: 10, E: -15 }
+        }
+    ];
+
+    // Classroom Incidents Data
+    const classroomEvents = [
+        {
+            situation: "Học sinh đặt câu hỏi: 'Thưa cô, tại sao Mị trong Vợ chồng A Phủ ăn lá ngón lại chết, mà có trường hợp ăn lại không chết?'",
+            choices: [
+                {
+                    text: "Quát mắng học sinh vì đặt câu hỏi nhảm nhí, gây mất tập trung.",
+                    effect: { S: -5, D: -10, E: -5 },
+                    feedback: "Học sinh sợ hãi ngắt lời, không khí lớp học trở nên vô cùng căng thẳng."
+                },
+                {
+                    text: "Giải thích rõ dưới góc độ sinh học/dược lý và tâm lý muốn giải thoát của Mị, khen ngợi sự tìm tòi.",
+                    effect: { S: 10, D: 5, E: -10 },
+                    feedback: "Cả lớp trầm ồ thích thú, học sinh nhận ra góc nhìn độc đáo về tác phẩm."
+                },
+                {
+                    text: "Phớt lờ câu hỏi và yêu cầu học sinh tiếp tục đọc SGK.",
+                    effect: { S: -2, D: 0, E: 0 },
+                    feedback: "Học sinh hụt hẫng và bắt đầu quay sang nói chuyện riêng."
+                }
+            ]
+        },
+        {
+            situation: "Trong giờ giảng bài 'Sóng' của Xuân Quỳnh, một nam sinh lớp 12 gục xuống bàn ngủ gật.",
+            choices: [
+                {
+                    text: "Nhẹ nhàng đi xuống vỗ vai nhắc nhở và đặt một câu hỏi đơn giản để em tham gia bài.",
+                    effect: { S: 8, D: 5, E: -5 },
+                    feedback: "Học sinh tỉnh giấc, ngượng ngùng trả lời và tập trung nghe giảng tiếp."
+                },
+                {
+                    text: "Ghi tên học sinh vào sổ đầu bài và phạt đứng ở cuối lớp.",
+                    effect: { S: -5, D: -5, E: -5 },
+                    feedback: "Học sinh chống đối, lớp học mất đi không khí lãng mạn của bài thơ."
+                }
+            ]
+        }
+    ];
+
+    // UI Updating
+    function updateUI() {
+        document.getElementById('stat-c').innerText = gameState.stats.C;
+        document.getElementById('stat-s').innerText = gameState.stats.S;
+        document.getElementById('stat-d').innerText = gameState.stats.D;
+        document.getElementById('stat-e').innerText = gameState.stats.E;
+
+        const badge = document.getElementById('phase-badge');
+        const title = document.getElementById('semester-title');
+
+        if (gameState.semester <= 6) {
+            badge.innerText = `Học Kỳ ${gameState.semester}`;
+            title.innerText = `Giai Đoạn 1: Luyện Rèn Tại Đại Học`;
+        } else if (gameState.semester === 7) {
+            badge.innerText = `Học Kỳ 7`;
+            title.innerText = `Giai Đoạn 2: Thực Tập Sư Phạm`;
+        } else {
+            badge.innerText = `Học Kỳ 8`;
+            title.innerText = `Giai Đoạn 3: Khóa Luận & Tốt Nghiệp`;
+        }
+    }
+
+    function changeStats(c, s, d, e) {
+        gameState.stats.C = Math.max(0, gameState.stats.C + c);
+        gameState.stats.S = Math.max(0, gameState.stats.S + s);
+        gameState.stats.D = Math.min(100, Math.max(0, gameState.stats.D + d));
+        gameState.stats.E = Math.min(100, Math.max(0, gameState.stats.E + e));
+        updateUI();
+    }
+
+    // Phase 1: University Life Loop
+    function renderPhase1() {
+        const dialog = document.getElementById('dialog-text');
+        const area = document.getElementById('interaction-area');
+
+        dialog.innerText = `Bạn đang ở Học kỳ ${gameState.semester}. Hãy lựa chọn hoạt động rèn luyện để tích lũy chỉ số Chuyên môn (C) và Kỹ năng Sư phạm (S).`;
+
+        area.innerHTML = `
+            <div class="action-grid">
+                <button class="action-btn" onclick="startQuiz()">📚 Lên lớp & Giải đố Văn học (+C)</button>
+                <button class="action-btn" onclick="practiceTeaching()">🎤 Tập giảng nhóm & CLB (+S)</button>
+                <button class="action-btn" onclick="rest()">☕ Nghỉ ngơi hồi sức (+⚡)</button>
+                <button class="action-btn" onclick="advanceSemester()">⏩ Thi kết thúc Học kỳ</button>
+            </div>
+        `;
+    }
+
+    function startQuiz() {
+        if (gameState.stats.E < 15) {
+            alert("Bạn quá mệt mỏi! Hãy nghỉ ngơi để hồi phục năng lượng.");
+            return;
+        }
+
+        const quiz = literaryQuizzes[Math.floor(Math.random() * literaryQuizzes.length)];
+        const dialog = document.getElementById('dialog-text');
+        const area = document.getElementById('interaction-area');
+
+        dialog.innerText = `[Thử thách Văn học] ${quiz.question}`;
+
+        let html = '';
+        quiz.options.forEach((opt, idx) => {
+            html += `<button class="quiz-option" onclick="answerQuiz(${idx}, ${quiz.correct}, ${quiz.reward.C}, ${quiz.reward.E})">${opt}</button>`;
+        });
+        area.innerHTML = html;
+    }
+
+    function answerQuiz(selected, correct, rewardC, rewardE) {
+        const dialog = document.getElementById('dialog-text');
+        if (selected === correct) {
+            changeStats(rewardC, 0, 0, rewardE);
+            dialog.innerText = "Chính xác! Bạn nhận được +" + rewardC + " Chuyên môn Văn học.";
+        } else {
+            changeStats(0, 0, 0, rewardE);
+            dialog.innerText = "Chưa chính xác! Cần đọc thêm tài liệu để củng cố kiến thức.";
+        }
+        setTimeout(renderPhase1, 1500);
+    }
+
+    function practiceTeaching() {
+        if (gameState.stats.E < 15) {
+            alert("Bạn quá mệt mỏi! Hãy nghỉ ngơi để hồi phục năng lượng.");
+            return;
+        }
+        changeStats(0, 8, 2, -15);
+        document.getElementById('dialog-text').innerText = "Bạn đã tích cực tham gia buổi tập giảng bài và nhận phản hồi tích cực từ giảng viên! (+8 Kỹ năng Sư phạm, +2 Đạo đức)";
+        setTimeout(renderPhase1, 1500);
+    }
+
+    function rest() {
+        changeStats(0, 0, 0, 40);
+        document.getElementById('dialog-text').innerText = "Bạn dành một ngày nghỉ ngơi thư giãn, uống cà phê và đọc sách. Năng lượng đã được phục hồi!";
+        setTimeout(renderPhase1, 1200);
+    }
+
+    function advanceSemester() {
+        if (gameState.stats.C < gameState.semester * 12 || gameState.stats.S < gameState.semester * 12) {
+            alert(`Bạn cần đạt tối thiểu ${gameState.semester * 12} điểm Chuyên môn và Sư phạm để vượt qua kỳ thi này!`);
+            return;
+        }
+
+        gameState.semester++;
+        updateUI();
+
+        if (gameState.semester <= 6) {
+            alert(`Chúc mừng bạn đã hoàn thành Học kỳ ${gameState.semester - 1}! Bước sang học kỳ mới.`);
+            renderPhase1();
+        } else if (gameState.semester === 7) {
+            alert("Chúc mừng! Bạn đã bước vào Học kỳ 7: Kỳ Thực Tập Sư Phạm tại trường THPT!");
+            renderPhase2LessonPlan();
+        }
+    }
+
+    // Phase 2: Internship & Lesson Planning
+    function renderPhase2LessonPlan() {
+        const dialog = document.getElementById('dialog-text');
+        const area = document.getElementById('interaction-area');
+
+        dialog.innerText = "GIAI ĐOẠN 2: THỰC TẬP SƯ PHẠM. Nhiệm vụ đầu tiên: Soạn Giáo Án cho tiết dạy học tác phẩm 'Vợ Nhặt' (Kim Lân). Hãy chọn tổ hợp phương pháp tối ưu!";
+
+        area.innerHTML = `
+            <div style="display:flex; flex-direction:column; gap:8px;">
+                <button class="choice-btn" onclick="selectLessonStep(1)">1. Khởi động bằng Video bối cảnh nạn đói 1945 + Thảo luận nhóm</button>
+                <button class="choice-btn" onclick="selectLessonStep(2)">2. Cho học sinh đọc thuộc lòng SGK + Thuyết giảng truyền thống</button>
+                <button class="choice-btn" onclick="selectLessonStep(3)">3. Vẽ sơ đồ tư duy phân tích hình tượng nhân vật Tràng</button>
+            </div>
+        `;
+    }
+
+    function selectLessonStep(step) {
+        if (step === 1 || step === 3) {
+            gameState.lessonPlanScore += 50;
+        } else {
+            gameState.lessonPlanScore += 20;
+        }
+
+        const dialog = document.getElementById('dialog-text');
+        dialog.innerText = `Giáo án của bạn hoàn thành với chất lượng điểm đạt: ${gameState.lessonPlanScore}/100. Chuẩn bị bước vào tiết giảng thực tế!`;
+
+        setTimeout(renderPhase2Classroom, 2000);
+    }
+
+    function renderPhase2Classroom() {
+        const event = classroomEvents[Math.floor(Math.random() * classroomEvents.length)];
+        const dialog = document.getElementById('dialog-text');
+        const area = document.getElementById('interaction-area');
+
+        dialog.innerText = `[Tình Huống Lớp Học] ${event.situation}`;
+
+        let html = '';
+        event.choices.forEach((choice, idx) => {
+            html += `<button class="choice-btn" onclick="handleClassroomChoice(${choice.effect.S}, ${choice.effect.D}, ${choice.effect.E}, '${choice.feedback}')">${choice.text}</button>`;
+        });
+        area.innerHTML = html;
+    }
+
+    function handleClassroomChoice(s, d, e, feedback) {
+        changeStats(0, s, d, e);
+        const dialog = document.getElementById('dialog-text');
+        dialog.innerText = feedback;
+
+        setTimeout(() => {
+            gameState.semester = 8;
+            updateUI();
+            renderPhase3Graduation();
+        }, 2500);
+    }
+
+    // Phase 3: Graduation
+    function renderPhase3Graduation() {
+        const dialog = document.getElementById('dialog-text');
+        const area = document.getElementById('interaction-area');
+
+        dialog.innerText = "GIAI ĐOẠN 3: LỄ TỐT NGHIỆP & BẢO VỆ KHÓA LUẬN. Bạn đứng trước Hội đồng Phản biện Khoa Ngữ văn!";
+
+        area.innerHTML = `
+            <button class="action-btn" style="text-align:center; font-weight:bold;" onclick="calculateFinalResult()">🎓 Tiến hành Trình bày Khóa Luận & Nhận Kết Quả Tốt Nghiệp</button>
+        `;
+    }
+
+    function calculateFinalResult() {
+        const dialog = document.getElementById('dialog-text');
+        const area = document.getElementById('interaction-area');
+
+        const totalScore = gameState.stats.C + gameState.stats.S + gameState.stats.D + (gameState.lessonPlanScore / 2);
+        let degree = "";
+
+        if (totalScore >= 200) {
+            degree = "BẰNG XUẤT SẮC 🌟 (Bạn trở thành Giáo viên Giỏi Quốc gia!)";
+        } else if (totalScore >= 150) {
+            degree = "BẰNG GIỎI 🎓 (Bạn nhận công tác tại Trường Chuyên danh tiếng)";
+        } else if (totalScore >= 110) {
+            degree = "BẰNG KHÁ 📜 (Bạn trở thành Giáo viên Ngữ văn nhiệt huyết)";
+        } else {
+            degree = "BẰNG TRUNG BÌNH 📄 (Cần tiếp tục trau dồi thêm kinh nghiệm chuyên môn)";
+        }
+
+        dialog.innerHTML = `
+            <h2 style="color: var(--accent-color); margin-bottom: 10px;">LỄ TRAO BẰNG TỐT NGHIỆP CỬ NHÂN SƯ PHẠM VĂN</h2>
+            <p><strong>Tổng điểm tích lũy:</strong> ${Math.round(totalScore)}</p>
+            <p><strong>Xếp loại Tốt nghiệp:</strong> ${degree}</p>
+            <div class="feedback-text">"Chở bao nhiêu đạo thuyền không khụ, Đâm mấy thằng gian bút chẳng tà." Chúc mừng thầy/cô giáo tương lai!</div>
+        `;
+
+        area.innerHTML = `
+            <button class="action-btn" style="text-align:center;" onclick="location.reload()">🔄 Chơi Lại Từ Đầu</button>
+        `;
+    }
+
+    // Initialize Game
+    renderPhase1();
+    updateUI();
+</script>
+</body>
+</html>
